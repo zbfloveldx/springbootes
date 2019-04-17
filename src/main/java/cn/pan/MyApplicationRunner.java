@@ -68,7 +68,6 @@ public class MyApplicationRunner implements ApplicationRunner {
                     "file", 3, 0, builder);
 
             if (isSuccess) {
-
                 logger.info("索引初始化成功.索引名: userdoc,类型名: file,分片数: 3,副本数: 0");
                 /**
                  * 批量导数据
@@ -87,12 +86,10 @@ public class MyApplicationRunner implements ApplicationRunner {
                     }
                 }
                 restService.indexDoc("userdoc", "file", fileList);
-
             } else {
                 logger.error("索引初始化失败.");
 
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

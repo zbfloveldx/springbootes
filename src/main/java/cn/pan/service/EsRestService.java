@@ -42,10 +42,7 @@ public class EsRestService {
 
     public RestHighLevelClient getRestClient() {
 
-        RestHighLevelClient client = new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost("localhost", 9200, "http")));
-
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
         return client;
     }
 
@@ -60,21 +57,13 @@ public class EsRestService {
      * @return
      */
 
-    public Boolean initIndex(String indexName,
-                             String typeName,
-                             int shardNum,
-                             int replicNum,
-                             XContentBuilder builder) {
+    public Boolean initIndex(String indexName,String typeName,int shardNum,int replicNum,XContentBuilder builder) {
         //创建索引
         RestHighLevelClient client = getRestClient();
         CreateIndexRequest request = new CreateIndexRequest(indexName);
-
         //设置分片和副本
-        request.settings(Settings.builder()
-                .put("index.number_of_shards", shardNum)
-                .put("index.number_of_replicas", replicNum)
+        request.settings(Settings.builder().put("index.number_of_shards", shardNum).put("index.number_of_replicas", replicNum)
         );
-
         request.mapping(typeName, builder);
         CreateIndexResponse createIndexResponse = null;
         try {
@@ -146,7 +135,6 @@ public class EsRestService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -158,17 +146,13 @@ public class EsRestService {
      * @param docList
      * @return
      */
-
-    public boolean indexDoc(String indexName,
-                            String typeName,
-                            List docList) {
+    public boolean indexDoc(String indexName,String typeName,List docList) {
         RestHighLevelClient client = getRestClient();
         BulkRequest bulkRequest = new BulkRequest();
         Iterator<String> iter = docList.iterator();
         while (iter.hasNext()) {
             String jsonString = iter.next();
-            IndexRequest indexRequest = new IndexRequest(indexName, typeName)
-                    .source(jsonString, XContentType.JSON);
+            IndexRequest indexRequest = new IndexRequest(indexName, typeName).source(jsonString, XContentType.JSON);
             bulkRequest.add(indexRequest);
         }
         try {
@@ -194,46 +178,33 @@ public class EsRestService {
      * @param pageSize
      * @return
      */
-    public ArrayList<Map<String, Object>> searchDocs(String indics,
-                                                     String keyword,
-                                                     String[] fieldNames,
-                                                     int pageNum,
-                                                     int pageSize) {
+    public ArrayList<Map<String, Object>> searchDocs(String indics,String keyword,String[] fieldNames,int pageNum,int pageSize) {
 
         SearchRequest searchRequest = new SearchRequest(indics);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-        MultiMatchQueryBuilder multiMatchQuery = QueryBuilders
-                .multiMatchQuery(keyword, fieldNames)
-                .operator(Operator.AND);
+        MultiMatchQueryBuilder multiMatchQuery = QueryBuilders.multiMatchQuery(keyword, fieldNames).operator(Operator.AND);
         HighlightBuilder highlightBuilder = new HighlightBuilder();
-        HighlightBuilder.Field highlightTitle =
-                new HighlightBuilder.Field("title");
+        HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("title");
         highlightBuilder.field(highlightTitle);
         HighlightBuilder.Field highlightFilecontent = new HighlightBuilder.Field("filecontent");
         highlightBuilder.field(highlightFilecontent);
 
-        highlightBuilder
-                .preTags("<span style=color:red>")
-                .postTags("</span>");
+        highlightBuilder.preTags("<span style=color:red>").postTags("</span>");
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(multiMatchQuery);
         searchSourceBuilder.from((pageNum - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
         searchRequest.source(searchSourceBuilder);
         ArrayList<Map<String, Object>> resultList = new ArrayList<>();
-
         try {
-            SearchResponse searchResponse = getRestClient()
-                    .search(searchRequest);
+            SearchResponse searchResponse = getRestClient().search(searchRequest);
             SearchHits hits = searchResponse.getHits();
             SearchHit[] searchHits = hits.getHits();
             for (SearchHit hit : searchHits) {
-
                 Map<String, Object> sourceAsMap = hit.getSourceAsMap();
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
                 HighlightField hTitle = highlightFields.get("title");
-
                 if (hTitle != null) {
                     String hTitleText = "";
                     Text[] fragments = hTitle.fragments();
@@ -253,12 +224,9 @@ public class EsRestService {
                 }
                 resultList.add(sourceAsMap);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         return resultList;
     }
 }

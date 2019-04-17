@@ -9,12 +9,8 @@ import javax.annotation.Resource;
 @Resource
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDoc {
     private String title;
     private String filecontent;
-
-    public UserDoc(String title, String filecontent) {
-        this.title = title;
-        this.filecontent = filecontent;
-    }
 }
