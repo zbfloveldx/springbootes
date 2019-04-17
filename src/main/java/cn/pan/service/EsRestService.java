@@ -12,6 +12,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
@@ -134,17 +135,17 @@ public class EsRestService {
      * @return
      */
     public boolean deleteIndex(String indexName) {
-//        try {
-//            if (existIndex(indexName)) {
-//                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-//                DeleteIndexResponse deleteIndexResponse = getRestClient().indices().delete(deleteIndexRequest);
-//                return deleteIndexResponse.isAcknowledged();
-//            } else {
-//                logger.info("索引不存在");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (existIndex(indexName)) {
+                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+                AcknowledgedResponse deleteIndexResponse = getRestClient().indices().delete(deleteIndexRequest);
+                return deleteIndexResponse.isAcknowledged();
+            } else {
+                logger.info("索引不存在");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return false;
     }

@@ -65,7 +65,7 @@ public class EsfilesearchApplicationTests {
 
     @Test
     public void test2() {
-        System.out.println(esConfiguration.getHost());
+//        System.out.println(esConfiguration.getHost());
     }
 
 
